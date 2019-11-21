@@ -1,37 +1,26 @@
-import pytesseract as ocr
 from PIL import Image
+import pytesseract as ocr
 import cv2
-import numpy as np
+import sys
  
-# Esqueleto
-img = cv2.imread('teste-basico.jpg',0)
-img = cv2.resize(img, (1000, 1000))
-size = np.size(img)
-skel = np.zeros(img.shape,np.uint8)
-cv2.imshow("test", img)
-cv2.waitKey(0)
-ret,img = cv2.threshold(img,150,255,cv2.THRESH_BINARY)
-element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-done = False
-while( not done):
-    eroded = cv2.erode(img,element)
-    temp = cv2.dilate(eroded,element)
-    temp = cv2.subtract(img,temp)
-    skel = cv2.bitwise_or(skel,temp)
-    img = eroded.copy()
+# Read image
+img = cv2.imread('inteiro-distorcido.jpg')
 
-    zeros = size - cv2.countNonZero(img)
-    if zeros==size:
-        done = True
-cv2.imshow("skel",skel)
+# Get dimensions
+height, width, channels = img.shape
+
+# Binarizy image
+for i in range(0, height):
+    for j in range(0, width):
+        if img[i][j][0] < 190 and (img[i][j][1] > 10 or img[i][j][1] < 255) and img[i][j][2] > 210:
+            img[i][j] = [255, 255, 255]
+        else:
+            img[i][j] = [0, 0, 0]
+
+cv2.imshow("binary Image", img)
 cv2.waitKey(0)
- 
-# Ler Texto
-phrase = ocr.image_to_string(img, config='por')
+
+# Try to read text
+phrase = ocr.image_to_string(img)
 print(phrase)
-
-
-# Filtro
-img = cv2.imread('opencv_logo.png')
-kernel = np.ones((5,5),np.float32)/25
-dst = cv2.filter2D(img,-1,kernel)
+sys.exit(0)
