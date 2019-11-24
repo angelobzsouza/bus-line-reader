@@ -1,40 +1,61 @@
-from PIL import Image
-import pytesseract as ocr
-import numpy as np
-import cv2
+# coding: utf-8
+# Aux imports
 import sys
+import numpy as np
 
-# Open image
-image = cv2.imread('letreiro-pequeno-distorcido.png');
-#image = cv2.resize(image, (1920, 1080))
-image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# Imports to manipulate images
+import cv2
+import pytesseract as pythonOcr
 
-# Get image infos
-height, width = image.shape
+# Personal imports
+import utils
 
-# Cut image and get the superior part
-#cropedImage = image[0:height/2, 0:width]
+# LOCAL ATTEMPTS
+# Open Image
+image = cv2.imread('images/'+sys.argv[1]);
+image = cv2.resize(image, (912, 513))
 
-# Filter
-kernel = np.ones((7,7), np.float32)/25
-filtredImage = cv2.filter2D(image, -1, kernel)
+# Get entire image proprieties
+height, width, channels = image.shape
 
-cv2.imshow("filtred Image", filtredImage)
-cv2.waitKey(0)
+# crop image upper half
+croppedImage = image[0:height/2, 0:width]
 
-# Create binary image
-ret, binaryImage = cv2.threshold(filtredImage, 240, 255, cv2.THRESH_BINARY_INV)
+# Get croped image proprieties
+croppedHeight, croppedWidth, croppedchannels = croppedImage.shape
 
-cv2.imshow("binary Image", binaryImage)
-cv2.waitKey(0)
+# BINARY WITH ORANGE ATTEMPT
+# Binarize image using orange pixels as parameter
+binaryByOrangeImage = croppedImage
+for i in range(0, croppedHeight):
+    for j in range(0, croppedWidth):
+        if croppedImage[i][j][0] < 200 and (croppedImage[i][j][1] > 10 or croppedImage[i][j][1] < 255) and croppedImage[i][j][2] > 200:
+            binaryByOrangeImage[i][j] = [255, 255, 255]
+        else:
+            binaryByOrangeImage[i][j] = [0, 0, 0]
 
-# Trying otsu binary
-#blur = cv2.GaussianBlur(cropedImage,(11,11),0)
-#ret3,th3 = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-#cv2.imshow("otsu Image", th3)
-#cv2.waitKey(0)
+# Get line number
+firstTryText = pythonOcr.image_to_string(binaryByOrangeImage)
+lineNumber = utils.getLineNumber(firstTryText)
 
-# Try to read text
-phrase = ocr.image_to_string(binaryImage)
-print(phrase)
-sys.exit(0)
+# Try to get line name
+utils.trySpeakLineName(lineNumber, 'Binarização com laranja', False)
+
+# BINARY WITH ORANGE AND OPEN ATTEMPT
+# Morphologic transformations
+kernel = np.ones((5, 5), np.uint8) 
+dilatedBinaryByOrangeImage = cv2.dilate(binaryByOrangeImage, kernel, iterations=1)
+
+# Get line number
+secondTryText = pythonOcr.image_to_string(dilatedBinaryByOrangeImage)
+lineNumber = utils.getLineNumber(secondTryText)
+
+# Try to get line name
+utils.trySpeakLineName(lineNumber, 'Expadir a imagem binaria com laranja', False)
+
+# CLOUD ATTEMPTS
+# BINARY WITH ORANGE ATTEMPT
+# BINARY WITH ORANGE AND OPEN ATTEMPT
+# BINARY WITH WHITE ATTEMPT
+# BINARY WITH WHITE AND OPEN ATTEMPT
+# NORMAL IMAGE ATTEMPT
