@@ -14,7 +14,7 @@ def searchLine (lineNumber):
     try:
         lineName = lines[str(lineNumber)]
         os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
-        sys._exit(1)
+        sys.exit(0)
     except Exception as e:
         return False
 
