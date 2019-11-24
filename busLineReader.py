@@ -3,7 +3,6 @@ import utils
 import sys
 import attempts
 
-# Create images
 image = utils.openImage(sys.argv[1])
 binaryOrangeImage = utils.binaryByOrange(image)
 binaryOrangeDilatedImage = utils.dilateBinary(binaryOrangeImage, 5)

@@ -2,6 +2,8 @@
 import json
 import cv2
 import numpy
+import os
+import sys
 
 # Import lines
 with open('jsons/lines.json') as linesFile:
@@ -12,7 +14,7 @@ def searchLine (lineNumber):
     try:
         lineName = lines[str(lineNumber)]
         os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
-        sys.exit(0)
+        sys._exit(1)
     except Exception as e:
         return False
 
@@ -47,8 +49,7 @@ def getLineNumber (string):
 def checkLine (strings, attemptName):
     for string in strings:
         lineNumber = getLineNumber(string)
-        if (not searchLine(lineNumber)):
-            print 'Tentiva falha: '+attemptName
+        searchLine(lineNumber)
 
 def getTextsDescriptions (texts):
     descriptions = []
@@ -68,8 +69,8 @@ def openImage (path):
 
 def binaryByOrange (image):
     height, width, channels = image.shape
-
-    binaryImage = image
+ 
+    binaryImage = image.copy()
     for i in range(0, height):
         for j in range(0, width):
             if image[i][j][0] < 100 and image[i][j][1] > 60 and image[i][j][1] < 170 and image[i][j][2] > 150:
@@ -82,7 +83,7 @@ def binaryByOrange (image):
 def binaryByWhite (image):
     height, width, channels = image.shape
 
-    binaryImage = image
+    binaryImage = image.copy()
     for i in range(0, height):
         for j in range(0, width):
             if image[i][j][0] > 200 and image[i][j][0] > 200 and image[i][j][2] > 200:
@@ -96,7 +97,7 @@ def dilateBinary (binaryImage, kernelSize):
     kernel = numpy.ones((kernelSize, kernelSize), numpy.uint8) 
     dilatedImage = cv2.dilate(binaryImage, kernel, iterations=1)
 
-    return binaryImage
+    return dilatedImage
 
 def showImage (image):
     cv2.imshow("Imagem", image)
