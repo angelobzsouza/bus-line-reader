@@ -4,6 +4,7 @@ import cv2
 import numpy
 import os
 import sys
+import busLineReader
 
 # Import lines
 with open('jsons/lines.json') as linesFile:
@@ -13,7 +14,10 @@ with open('jsons/lines.json') as linesFile:
 def searchLine (lineNumber):
     try:
         lineName = lines[str(lineNumber)]
-        os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
+        if not busLineReader.checkLineAlredyFound():
+            busLineReader.setLineFound()
+            os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
+        busLineReader.setLineWarned()
         sys.exit(0)
     except Exception as e:
         return False
@@ -60,7 +64,7 @@ def getTextsDescriptions (texts):
 
 # Work with image
 def openImage (path):
-    image = cv2.imread('images/'+path);
+    image = cv2.imread(path);
     image = cv2.resize(image, (912, 513))
     height, width, channels = image.shape
     croppedImage = image[0:height/2, 0:width]

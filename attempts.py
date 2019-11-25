@@ -3,6 +3,7 @@ import pytesseract as pythonOcr
 import utils
 import cv2
 import io
+import busLineReader
 
 from google.cloud import vision
 from google.cloud.vision import types
@@ -16,6 +17,7 @@ def localAttempt (image, attemptName):
     imageStrings.append(imageString)
     utils.checkLine(imageStrings, attemptName)
     print 'Fail attempt: '+attemptName
+    busLineReader.setFail()
 
 def cloudAttempt (image, imageName, attemptName):
     cv2.imwrite('tempImages/temp'+imageName+'.jpg', image)
@@ -27,3 +29,4 @@ def cloudAttempt (image, imageName, attemptName):
     imageStrings = utils.getTextsDescriptions(response.text_annotations)
     utils.checkLine(imageStrings, attemptName)
     print 'Fail attempt: '+attemptName
+    busLineReader.setFail()
