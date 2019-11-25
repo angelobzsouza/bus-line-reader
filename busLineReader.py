@@ -2,6 +2,7 @@
 import utils
 import sys
 import attempts
+import os
 
 image = utils.openImage(sys.argv[1])
 binaryOrangeImage = utils.binaryByOrange(image)
@@ -16,3 +17,6 @@ attempts.cloudAttempt(binaryOrangeDilatedImage, 'BinaryOrangeDilatedImage', 'Dil
 attempts.cloudAttempt(binaryWhiteImage, 'BinaryWhiteImage', 'Binarização com branco na cloud')
 attempts.cloudAttempt(binaryWhiteDilatedImage, 'BinaryWhiteDiletedImage', 'Dilatação e binarização com branco na cloud')
 attempts.cloudAttempt(image, 'NormalImage', 'Imagem normal na cloud')
+
+os.system("espeak -v pt -s 140 'Não foi possível identificar a linha'")
+sys.exit(0)
