@@ -228,9 +228,6 @@ def main():
 	# normal sem brilho suavisada
 	unshinedSmoothedImage = smoothingImage(unshinedImage)
 
-
-	smoothed = smoothingImage(image)
-
 	## ORANGE ##
 	# binarizada normal 
 	binaryOrange = binaryByOrange(image)
@@ -304,7 +301,7 @@ def main():
 	thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'CLOUD: binarizada sem brilho suavisada branca'))
 	thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'CLOUD: binarizada sem brilho dilatada branca'))
 	thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'CLOUD: binarizada sem brilho suavisada dilatada branca'))
-	thread.start_new_thread(cloudAttempt,(smoothed, 'NormalImage', 'CLOUD: Imagem normal na cloud'))
+	thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'CLOUD: Imagem normal na cloud'))
 
 	while True:
 		if not running:
