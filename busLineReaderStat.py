@@ -15,6 +15,7 @@ from google.cloud.vision import types
 enableCloud = False
 
 attemptsFail = 0
+attemptsNumber = 16 #16 in local - 17 in cloud - 33 total
 listnerLineFound = False
 listnerLineWarned = False
 running = True
@@ -50,7 +51,7 @@ def cloudAttempt (image, imageName, attemptName):
         checkLine(imageStrings, attemptName, 'Global')
         setFail()
 
-#######################################################
+###########lineNumber############################################
 ##                      utills                       ##
 #######################################################
 
@@ -60,6 +61,7 @@ with open('jsons/lines.json') as linesFile:
 
 # Work with text
 def searchLine (lineNumber, attemptName, localOrGlobal):
+    print attemptName
     try:
         lineName = lines[str(lineNumber)]
         if not checkLineAlredyFound():
@@ -69,6 +71,7 @@ def searchLine (lineNumber, attemptName, localOrGlobal):
                 statFile.write('Achou;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
             else:
                 statFile.write('Errado;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
+            raise Exception()
     except Exception as e:
         return False
 
@@ -184,7 +187,7 @@ def listner():
         time.sleep(1)
         if listnerLineFound:
             finish()
-        if attemptsFail == 33:
+        if (attemptsFail == attemptsNumber):
             statFile.write('Nao Achou;-;-;'+expectedLine+';-;'+str(time.time() - initialTime)+'\n')
             finish()
 
@@ -212,29 +215,18 @@ def checkLineAlredyFound():
 ##                   busLineReader                   ##
 #######################################################
 
-def read(imageName, lineNumber, file):
+def main():
     global expectedLine
     global statFile
     global initialTime
     
-    
     initialTime = time.time()
-    expectedLine = lineNumber
-    statFile = file
+    expectedLine = sys.argv[2]
+    statFile = open('stats/stats.csv', 'a')
     thread.start_new_thread(listner, ())
 
-    ##- normal
-    ##- normal sem brilho
-    ##- normal suavizada
-    ##- binarizada normal
-    ##- binarizada sem brilho
-    ##- binarizada suavisada
-    ##- dilatada binarizada normal
-    ##- dilatada binarizada sem brilho
-    ##- dilatada binarizada suavisada
-
     # Abre a imagem
-    image = openImage(imageName)
+    image = openImage(sys.argv[1])
     # normal suavizada
     smoothedImage = smoothingImage(image)	
     # normal sem brilho
@@ -319,7 +311,7 @@ def read(imageName, lineNumber, file):
         thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
 
     while running:
-        if not running:
-            time.sleep(2)
+        time.sleep(2)
     
-    print 'finalizou'
+if __name__ == "__main__":
+	sys.exit(main())

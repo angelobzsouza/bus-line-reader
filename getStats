@@ -1,0 +1,9 @@
+#!/bin/bash
+FILES=images/*
+
+for file in $FILES
+do
+  lineNumber=$(echo $(basename $file) | cut -d- -f1)
+  lineNumber="${lineNumber/'_'/'/'}" 
+  python busLineReaderStat.py $(basename $file) $lineNumber
+done

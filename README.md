@@ -39,3 +39,28 @@ In the project folder, execute
 ```
 python busLineReader.py '<imageName>'
 ```
+
+## Generating stats
+You can only generate stats in a Linux OS. First, check the path of the bash folder in your system
+```
+which bash
+```
+
+copy this path in the start of file like this
+```
+#!<bashPath>
+```
+
+In the root folder, give permission to the stats script running the command
+```
+chmod 777 getStats
+```
+
+and than, execute
+```
+./getStats
+```
+
+P.S: It's necessary to change the attemptsNumber variable in busLineReaderStat.py file. If you are testing both methods set 33, just in local 16 and just in Google Vision API set 17.
+
+P.S 2: <strong>Pay attention</strong> before execute the stats script. The Google Vision it's paid and you can be taxed making a high quantity of requests.
