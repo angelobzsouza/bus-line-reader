@@ -25,7 +25,7 @@ initialTime = False
 #######################################################
 
 # Create google vision client
-client = vision.ImageAnnotatorClient()
+#client = vision.ImageAnnotatorClient()
 
 def localAttempt (image, attemptName):
     imageString = pythonOcr.image_to_string(image)
@@ -39,10 +39,10 @@ def cloudAttempt (image, imageName, attemptName):
     with io.open('tempImages/temp'+imageName+'.jpg', 'rb') as image_file:
         content = image_file.read()
 
-    imageCloud = vision.types.Image(content=content)
-    response = client.text_detection(image=imageCloud)
-    imageStrings = getTextsDescriptions(response.text_annotations)
-    checkLine(imageStrings, attemptName, 'Global')
+    #imageCloud = vision.types.Image(content=content)
+    #response = client.text_detection(image=imageCloud)
+    #imageStrings = getTextsDescriptions(response.text_annotations)
+    #checkLine(imageStrings, attemptName, 'Global')
     setFail()
 
 #######################################################
@@ -56,16 +56,18 @@ with open('jsons/lines.json') as linesFile:
 # Work with text
 def searchLine (lineNumber, attemptName, localOrGlobal):
     try:
-        lineName = lines[str(lineNumber)]
+
+        lineNumber = lines[str(lineNumber)]
+
         if not checkLineAlredyFound():
             setLineFound()
+            print 'achou '+str(lineNumber)+' '+str(expectedLine)
             if (lineNumber == expectedLine):
                 statFile.write('Achou;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
             else:
-                statFile.write('Found wrong line\n')
+                #statFile.write('Found wrong line\n')
                 statFile.write('Errado;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
             setLineWarned()
-            sys.exit(0)
     except Exception as e:
         return False
 
@@ -214,109 +216,109 @@ def read(imageName, lineNumber, file):
     global statFile
     global initialTime
     
-    try:
-        initialTime = time.time()
-        expectedLine = lineNumber
-        statFile = file
-        thread.start_new_thread(listner, ())
+    
+    initialTime = time.time()
+    expectedLine = lineNumber
+    statFile = file
+    thread.start_new_thread(listner, ())
 
-        ##- normal
-        ##- normal sem brilho
-        ##- normal suavizada
-        ##- binarizada normal
-        ##- binarizada sem brilho
-        ##- binarizada suavisada
-        ##- dilatada binarizada normal
-        ##- dilatada binarizada sem brilho
-        ##- dilatada binarizada suavisada
+    ##- normal
+    ##- normal sem brilho
+    ##- normal suavizada
+    ##- binarizada normal
+    ##- binarizada sem brilho
+    ##- binarizada suavisada
+    ##- dilatada binarizada normal
+    ##- dilatada binarizada sem brilho
+    ##- dilatada binarizada suavisada
 
-        # Abre a imagem
-        image = openImage(imageName)
-        # normal suavizada
-        smoothedImage = smoothingImage(image)	
-        # normal sem brilho
-        unshinedImage = unshiningImage(image)
-        # normal sem brilho suavisada
-        unshinedSmoothedImage = smoothingImage(unshinedImage)
+    # Abre a imagem
+    image = openImage(imageName)
+    # normal suavizada
+    smoothedImage = smoothingImage(image)	
+    # normal sem brilho
+    unshinedImage = unshiningImage(image)
+    # normal sem brilho suavisada
+    unshinedSmoothedImage = smoothingImage(unshinedImage)
 
-        ## ORANGE ##
-        # binarizada normal 
-        binaryOrange = binaryByOrange(image)
-        # binarizada normal suavisada
-        binaryOrangeSmoothed = binaryByOrange(smoothedImage)
-        # binarizada normal dilatada
-        binaryOrangeDilated = dilateBinary(binaryOrange, 5)
-        # binarizada normal suavisada dilatada
-        binaryOrangeSmoothedDilated = dilateBinary(binaryOrangeSmoothed, 5)
+    ## ORANGE ##
+    # binarizada normal 
+    binaryOrange = binaryByOrange(image)
+    # binarizada normal suavisada
+    binaryOrangeSmoothed = binaryByOrange(smoothedImage)
+    # binarizada normal dilatada
+    binaryOrangeDilated = dilateBinary(binaryOrange, 5)
+    # binarizada normal suavisada dilatada
+    binaryOrangeSmoothedDilated = dilateBinary(binaryOrangeSmoothed, 5)
 
-        # binarizada sem brilho
-        unshinedBinaryOrange = binaryByOrange(unshinedImage)
-        # binarizada sem brilho suavisada
-        unshinedBinaryOrangeSmoothed = binaryByOrange(unshinedSmoothedImage)
-        # binarizada sem brilho dilatada
-        unshinedBinaryOrangeDilated = dilateBinary(unshinedBinaryOrange, 5)
-        # binarizada sem brilho suavisada dilatada
-        unshinedBinaryOrangeSmoothedDilated = dilateBinary(unshinedBinaryOrangeSmoothed, 5)
+    # binarizada sem brilho
+    unshinedBinaryOrange = binaryByOrange(unshinedImage)
+    # binarizada sem brilho suavisada
+    unshinedBinaryOrangeSmoothed = binaryByOrange(unshinedSmoothedImage)
+    # binarizada sem brilho dilatada
+    unshinedBinaryOrangeDilated = dilateBinary(unshinedBinaryOrange, 5)
+    # binarizada sem brilho suavisada dilatada
+    unshinedBinaryOrangeSmoothedDilated = dilateBinary(unshinedBinaryOrangeSmoothed, 5)
 
-        ## WHITE ##
-        # binarizada normal
-        binaryWhite = binaryByWhite(image)
-        # binarizada normal suavisada
-        binaryWhiteSmoothed = binaryByWhite(smoothedImage)
-        # binarizada normal dilatada
-        binaryWhiteDilated = dilateBinary(binaryWhite, 5)
-        # binarizada normal suavisada dilatada
-        binaryWhiteSmoothedDilated = dilateBinary(binaryWhiteSmoothed, 5)
+    ## WHITE ##
+    # binarizada normal
+    binaryWhite = binaryByWhite(image)
+    # binarizada normal suavisada
+    binaryWhiteSmoothed = binaryByWhite(smoothedImage)
+    # binarizada normal dilatada
+    binaryWhiteDilated = dilateBinary(binaryWhite, 5)
+    # binarizada normal suavisada dilatada
+    binaryWhiteSmoothedDilated = dilateBinary(binaryWhiteSmoothed, 5)
 
-        # binarizada sem brilho
-        unshinedBinaryWhite = binaryByWhite(unshinedImage)
-        # binarizada sem brilho suavisada
-        unshinedBinaryWhiteSmoothed = binaryByWhite(unshinedSmoothedImage)
-        # binarizada sem brilho dilatada
-        unshinedBinaryWhiteDilated = dilateBinary(unshinedBinaryWhite, 5)
-        # binarizada sem brilho suavisada dilatada
-        unshinedBinaryWhiteSmoothedDilated = dilateBinary(unshinedBinaryWhiteSmoothed, 5)
+    # binarizada sem brilho
+    unshinedBinaryWhite = binaryByWhite(unshinedImage)
+    # binarizada sem brilho suavisada
+    unshinedBinaryWhiteSmoothed = binaryByWhite(unshinedSmoothedImage)
+    # binarizada sem brilho dilatada
+    unshinedBinaryWhiteDilated = dilateBinary(unshinedBinaryWhite, 5)
+    # binarizada sem brilho suavisada dilatada
+    unshinedBinaryWhiteSmoothedDilated = dilateBinary(unshinedBinaryWhiteSmoothed, 5)
 
-        ## LOCAL ATTEMPTS ##
-        thread.start_new_thread(localAttempt,(binaryOrange, 'binarizada normal laranja'))
-        thread.start_new_thread(localAttempt,(binaryOrangeSmoothed, 'binarizada normal suavisada laranja'))
-        thread.start_new_thread(localAttempt,(binaryOrangeDilated, 'binarizada normal dilatada laranja'))
-        thread.start_new_thread(localAttempt,(binaryOrangeSmoothedDilated, 'binarizada normal suavisada dilatada laranja'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryOrange, 'binarizada sem brilho laranja'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryOrangeSmoothed, 'binarizada sem brilho suavisada laranja'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryOrangeDilated, 'binarizada sem brilho dilatada laranja'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryOrangeSmoothedDilated, 'binarizada sem brilho suavisada dilatada laranja'))
-        thread.start_new_thread(localAttempt,(binaryWhite, 'binarizada normal branca'))
-        thread.start_new_thread(localAttempt,(binaryWhiteSmoothed, 'binarizada normal suavisada branca'))
-        thread.start_new_thread(localAttempt,(binaryWhiteDilated, 'binarizada normal dilatada branca'))
-        thread.start_new_thread(localAttempt,(binaryWhiteSmoothedDilated, 'binarizada normal suavisada dilatada branca'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryWhite, 'binarizada sem brilho branca'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothed, 'binarizada sem brilho suavisada branca'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryWhiteDilated, 'binarizada sem brilho dilatada branca'))
-        thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothedDilated, 'binarizada sem brilho suavisada dilatada branca'))
+    ## LOCAL ATTEMPTS ##
+    thread.start_new_thread(localAttempt,(binaryOrange, 'binarizada normal laranja'))
+    thread.start_new_thread(localAttempt,(binaryOrangeSmoothed, 'binarizada normal suavisada laranja'))
+    thread.start_new_thread(localAttempt,(binaryOrangeDilated, 'binarizada normal dilatada laranja'))
+    thread.start_new_thread(localAttempt,(binaryOrangeSmoothedDilated, 'binarizada normal suavisada dilatada laranja'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryOrange, 'binarizada sem brilho laranja'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryOrangeSmoothed, 'binarizada sem brilho suavisada laranja'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryOrangeDilated, 'binarizada sem brilho dilatada laranja'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryOrangeSmoothedDilated, 'binarizada sem brilho suavisada dilatada laranja'))
+    thread.start_new_thread(localAttempt,(binaryWhite, 'binarizada normal branca'))
+    thread.start_new_thread(localAttempt,(binaryWhiteSmoothed, 'binarizada normal suavisada branca'))
+    thread.start_new_thread(localAttempt,(binaryWhiteDilated, 'binarizada normal dilatada branca'))
+    thread.start_new_thread(localAttempt,(binaryWhiteSmoothedDilated, 'binarizada normal suavisada dilatada branca'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryWhite, 'binarizada sem brilho branca'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothed, 'binarizada sem brilho suavisada branca'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryWhiteDilated, 'binarizada sem brilho dilatada branca'))
+    thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothedDilated, 'binarizada sem brilho suavisada dilatada branca'))
 
-        ## CLOUD ATTEMPTS ##
-        thread.start_new_thread(cloudAttempt,(binaryOrange,'binaryOrange', 'binarizada normal laranja'))
-        thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothed,'binaryOrangeSmoothed', 'binarizada normal suavisada laranja'))
-        thread.start_new_thread(cloudAttempt,(binaryOrangeDilated,'binaryOrangeDilated', 'binarizada normal dilatada laranja'))
-        thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothedDilated,'binaryOrangeSmoothedDilated', 'binarizada normal suavisada dilatada laranja'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrange,'unshinedBinaryOrange', 'binarizada sem brilho laranja'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothed,'unshinedBinaryOrangeSmoothed', 'binarizada sem brilho suavisada laranja'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeDilated,'unshinedBinaryOrangeDilated', 'binarizada sem brilho dilatada laranja'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothedDilated,'unshinedBinaryOrangeSmoothedDilated', 'binarizada sem brilho suavisada dilatada laranja'))
-        thread.start_new_thread(cloudAttempt,(binaryWhite,'binaryWhite', 'binarizada normal branca'))
-        thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothed,'binaryWhiteSmoothed', 'binarizada normal suavisada branca'))
-        thread.start_new_thread(cloudAttempt,(binaryWhiteDilated,'binaryWhiteDilated', 'binarizada normal dilatada branca'))
-        thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothedDilated,'binaryWhiteSmoothedDilated', 'binarizada normal suavisada dilatada branca'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhite,'unshinedBinaryWhite', 'binarizada sem brilho branca'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'binarizada sem brilho suavisada branca'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'binarizada sem brilho dilatada branca'))
-        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'binarizada sem brilho suavisada dilatada branca'))
-        thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
+    ## CLOUD ATTEMPTS ##
+    thread.start_new_thread(cloudAttempt,(binaryOrange,'binaryOrange', 'binarizada normal laranja'))
+    thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothed,'binaryOrangeSmoothed', 'binarizada normal suavisada laranja'))
+    thread.start_new_thread(cloudAttempt,(binaryOrangeDilated,'binaryOrangeDilated', 'binarizada normal dilatada laranja'))
+    thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothedDilated,'binaryOrangeSmoothedDilated', 'binarizada normal suavisada dilatada laranja'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrange,'unshinedBinaryOrange', 'binarizada sem brilho laranja'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothed,'unshinedBinaryOrangeSmoothed', 'binarizada sem brilho suavisada laranja'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeDilated,'unshinedBinaryOrangeDilated', 'binarizada sem brilho dilatada laranja'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothedDilated,'unshinedBinaryOrangeSmoothedDilated', 'binarizada sem brilho suavisada dilatada laranja'))
+    thread.start_new_thread(cloudAttempt,(binaryWhite,'binaryWhite', 'binarizada normal branca'))
+    thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothed,'binaryWhiteSmoothed', 'binarizada normal suavisada branca'))
+    thread.start_new_thread(cloudAttempt,(binaryWhiteDilated,'binaryWhiteDilated', 'binarizada normal dilatada branca'))
+    thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothedDilated,'binaryWhiteSmoothedDilated', 'binarizada normal suavisada dilatada branca'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhite,'unshinedBinaryWhite', 'binarizada sem brilho branca'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'binarizada sem brilho suavisada branca'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'binarizada sem brilho dilatada branca'))
+    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'binarizada sem brilho suavisada dilatada branca'))
+    thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
 
-        while True:
-            if not running:
-                time.sleep(2)
-                sys.exit(0)
-    except Exception as e:
-        print e
+    while running:
+        if not running:
+            time.sleep(2)
+
+    
+    print 'finalizou'

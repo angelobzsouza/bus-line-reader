@@ -22,7 +22,7 @@ running = True
 #######################################################
 
 # Create google vision client
-client = vision.ImageAnnotatorClient()
+#client = vision.ImageAnnotatorClient()
 
 def localAttempt (image, attemptName):
     imageString = pythonOcr.image_to_string(image)
@@ -37,11 +37,11 @@ def cloudAttempt (image, imageName, attemptName):
     with io.open('tempImages/temp'+imageName+'.jpg', 'rb') as image_file:
         content = image_file.read()
 
-    imageCloud = vision.types.Image(content=content)
-    response = client.text_detection(image=imageCloud)
-    imageStrings = getTextsDescriptions(response.text_annotations)
-    checkLine(imageStrings, attemptName)
-    print 'Fail attempt: '+attemptName
+    #imageCloud = vision.types.Image(content=content)
+    #response = client.text_detection(image=imageCloud)
+    #imageStrings = getTextsDescriptions(response.text_annotations)
+    #checkLine(imageStrings, attemptName)
+    #print 'Fail attempt: '+attemptName
     setFail()
 
 #######################################################
@@ -55,10 +55,10 @@ with open('jsons/lines.json') as linesFile:
 # Work with text
 def searchLine (lineNumber):
     try:
-        lineName = lines[str(lineNumber)]
+        lineNumber = lines[str(lineNumber)]
         if not checkLineAlredyFound():
             setLineFound()
-            os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
+            #os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
             setLineWarned()
             sys.exit(0)
     except Exception as e:
@@ -179,8 +179,8 @@ def listner():
             print attemptsFail
 
         if attemptsFail == 33:
-            print "Fim "+attemptsFail
-            os.system("espeak -v pt -s 140 'Não foi possível identificar a linha'")
+            print "Fim "+str(attemptsFail)
+            #os.system("espeak -v pt -s 140 'Não foi possível identificar a linha'")
             finish()
 
 def finish():
