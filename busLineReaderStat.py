@@ -12,6 +12,8 @@ import pytesseract as pythonOcr
 from google.cloud import vision
 from google.cloud.vision import types
 
+enableCloud = False
+
 attemptsFail = 0
 listnerLineFound = False
 listnerLineWarned = False
@@ -25,7 +27,9 @@ initialTime = False
 #######################################################
 
 # Create google vision client
-#client = vision.ImageAnnotatorClient()
+if (enableCloud):
+	client = vision.ImageAnnotatorClient()
+	print 'Cloud is enabled!'
 
 def localAttempt (image, attemptName):
     imageString = pythonOcr.image_to_string(image)
@@ -35,15 +39,16 @@ def localAttempt (image, attemptName):
     setFail()
 
 def cloudAttempt (image, imageName, attemptName):
-    cv2.imwrite('tempImages/temp'+imageName+'.jpg', image)
-    with io.open('tempImages/temp'+imageName+'.jpg', 'rb') as image_file:
-        content = image_file.read()
+    if (enableCloud):
+        cv2.imwrite('tempImages/temp'+imageName+'.jpg', image)
+        with io.open('tempImages/temp'+imageName+'.jpg', 'rb') as image_file:
+            content = image_file.read()
 
-    #imageCloud = vision.types.Image(content=content)
-    #response = client.text_detection(image=imageCloud)
-    #imageStrings = getTextsDescriptions(response.text_annotations)
-    #checkLine(imageStrings, attemptName, 'Global')
-    setFail()
+        imageCloud = vision.types.Image(content=content)
+        response = client.text_detection(image=imageCloud)
+        imageStrings = getTextsDescriptions(response.text_annotations)
+        checkLine(imageStrings, attemptName, 'Global')
+        setFail()
 
 #######################################################
 ##                      utills                       ##
@@ -56,18 +61,14 @@ with open('jsons/lines.json') as linesFile:
 # Work with text
 def searchLine (lineNumber, attemptName, localOrGlobal):
     try:
-
-        lineNumber = lines[str(lineNumber)]
-
+        lineName = lines[str(lineNumber)]
         if not checkLineAlredyFound():
             setLineFound()
-            print 'achou '+str(lineNumber)+' '+str(expectedLine)
+            setLineWarned() 
             if (lineNumber == expectedLine):
                 statFile.write('Achou;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
             else:
-                #statFile.write('Found wrong line\n')
                 statFile.write('Errado;'+localOrGlobal+';'+lineNumber+';'+expectedLine+';'+attemptName+';'+str(time.time() - initialTime)+'\n')
-            setLineWarned()
     except Exception as e:
         return False
 
@@ -298,27 +299,27 @@ def read(imageName, lineNumber, file):
     thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothedDilated, 'binarizada sem brilho suavisada dilatada branca'))
 
     ## CLOUD ATTEMPTS ##
-    thread.start_new_thread(cloudAttempt,(binaryOrange,'binaryOrange', 'binarizada normal laranja'))
-    thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothed,'binaryOrangeSmoothed', 'binarizada normal suavisada laranja'))
-    thread.start_new_thread(cloudAttempt,(binaryOrangeDilated,'binaryOrangeDilated', 'binarizada normal dilatada laranja'))
-    thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothedDilated,'binaryOrangeSmoothedDilated', 'binarizada normal suavisada dilatada laranja'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrange,'unshinedBinaryOrange', 'binarizada sem brilho laranja'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothed,'unshinedBinaryOrangeSmoothed', 'binarizada sem brilho suavisada laranja'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeDilated,'unshinedBinaryOrangeDilated', 'binarizada sem brilho dilatada laranja'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothedDilated,'unshinedBinaryOrangeSmoothedDilated', 'binarizada sem brilho suavisada dilatada laranja'))
-    thread.start_new_thread(cloudAttempt,(binaryWhite,'binaryWhite', 'binarizada normal branca'))
-    thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothed,'binaryWhiteSmoothed', 'binarizada normal suavisada branca'))
-    thread.start_new_thread(cloudAttempt,(binaryWhiteDilated,'binaryWhiteDilated', 'binarizada normal dilatada branca'))
-    thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothedDilated,'binaryWhiteSmoothedDilated', 'binarizada normal suavisada dilatada branca'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhite,'unshinedBinaryWhite', 'binarizada sem brilho branca'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'binarizada sem brilho suavisada branca'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'binarizada sem brilho dilatada branca'))
-    thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'binarizada sem brilho suavisada dilatada branca'))
-    thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
+    if (enableCloud):
+        thread.start_new_thread(cloudAttempt,(binaryOrange,'binaryOrange', 'binarizada normal laranja'))
+        thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothed,'binaryOrangeSmoothed', 'binarizada normal suavisada laranja'))
+        thread.start_new_thread(cloudAttempt,(binaryOrangeDilated,'binaryOrangeDilated', 'binarizada normal dilatada laranja'))
+        thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothedDilated,'binaryOrangeSmoothedDilated', 'binarizada normal suavisada dilatada laranja'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrange,'unshinedBinaryOrange', 'binarizada sem brilho laranja'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothed,'unshinedBinaryOrangeSmoothed', 'binarizada sem brilho suavisada laranja'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeDilated,'unshinedBinaryOrangeDilated', 'binarizada sem brilho dilatada laranja'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryOrangeSmoothedDilated,'unshinedBinaryOrangeSmoothedDilated', 'binarizada sem brilho suavisada dilatada laranja'))
+        thread.start_new_thread(cloudAttempt,(binaryWhite,'binaryWhite', 'binarizada normal branca'))
+        thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothed,'binaryWhiteSmoothed', 'binarizada normal suavisada branca'))
+        thread.start_new_thread(cloudAttempt,(binaryWhiteDilated,'binaryWhiteDilated', 'binarizada normal dilatada branca'))
+        thread.start_new_thread(cloudAttempt,(binaryWhiteSmoothedDilated,'binaryWhiteSmoothedDilated', 'binarizada normal suavisada dilatada branca'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhite,'unshinedBinaryWhite', 'binarizada sem brilho branca'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'binarizada sem brilho suavisada branca'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'binarizada sem brilho dilatada branca'))
+        thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'binarizada sem brilho suavisada dilatada branca'))
+        thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
 
     while running:
         if not running:
             time.sleep(2)
-
     
     print 'finalizou'

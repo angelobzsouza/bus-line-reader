@@ -1,7 +1,6 @@
 import busLineReaderStat
 import json
 import sys
-import time
 
 # Open enum
 with open('jsons/enumLines.json') as linesFile:
@@ -16,14 +15,7 @@ with open('jsons/enumLines.json') as linesFile:
 
 statFile = open("stats/"+sys.argv[1]+".csv","w")
 statFile.write('Resultado;Local/Cloud;Linha Encontrada;Linha Esperada;Metodo;Tempo\n')
-
-busLineReaderStat.read('18-5.jpg', '18', statFile)
-
-busLineReaderStat.read('60-1.jpg', '60', statFile)
-
-busLineReaderStat.read('81-1.jpg', '81', statFile)
-
-busLineReaderStat.read('77-1.jpg', '77', statFile)
-
-busLineReaderStat.read('100-1.jpg', '100', statFile)
+busLineReaderStat.read('ufscar-laranja-lado.jpg', '80', statFile)
+busLineReaderStat.read('expresso-frente-laranja.jpg', '100', statFile)
+busLineReaderStat.read('maria-eugenia-laranja-frente-3.jpg', '59', statFile)
 sys.exit(0)
