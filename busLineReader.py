@@ -2,10 +2,8 @@
 import sys
 import os
 import signal
-import socket
 import thread
 import time
-import utils
 import io
 import cv2
 import numpy
@@ -59,11 +57,10 @@ def searchLine (lineNumber):
     try:
         lineName = lines[str(lineNumber)]
         if not checkLineAlredyFound():
-            #setLineFound() #comentar para testar todas as possibilidades
-            print 'ACHOU '+str(lineNumber)+str(lineName)
-            #os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
-        #setLineWarned() #comentar para testar todas as possibilidades
-        sys.exit(0)
+            setLineFound()
+            os.system("espeak -v pt -s 140 'A linha "+str(lineName)+" está se aproximando'")
+            setLineWarned()
+            sys.exit(0)
     except Exception as e:
         return False
 
@@ -109,7 +106,7 @@ def getTextsDescriptions (texts):
 
 # Working with image
 def openImage (path):
-    image = cv2.imread(path);
+    image = cv2.imread('images/'+path);
     image = cv2.resize(image, (912, 513))
     height, width, channels = image.shape
     croppedImage = image[0:height/2, 0:width]
@@ -172,19 +169,19 @@ def showImage (image):
     cv2.imshow("Imagem", image)
     cv2.waitKey(0)
 
-#######################################################
-##                   busLineReader                   ##
-#######################################################
-
+# Work with threads
 def listner():
-	global attemptsFail
-	while True:
-		time.sleep(1)
-		if listnerLineFound:
-			finish()
-		if attemptsFail == 33:
-			#os.system("espeak -v pt -s 140 'Não foi possível identificar a linha'")
-			finish()
+    global attemptsFail
+    while True:
+        time.sleep(1)
+        if listnerLineFound:
+            finish()
+            print attemptsFail
+
+        if attemptsFail == 33:
+            print "Fim "+attemptsFail
+            os.system("espeak -v pt -s 140 'Não foi possível identificar a linha'")
+            finish()
 
 def finish():
 	global running
@@ -206,18 +203,23 @@ def setLineWarned():
 def checkLineAlredyFound():
 	return listnerLineFound
 
+
+#######################################################
+##                   busLineReader                   ##
+#######################################################
+
 def main():
 	thread.start_new_thread(listner, ())
 
-##- normal
-##- normal sem brilho
-##- normal suavizada
-##- binarizada normal
-##- binarizada sem brilho
-##- binarizada suavisada
-##- dilatada binarizada normal
-##- dilatada binarizada sem brilho
-##- dilatada binarizada suavisada
+    ##- normal
+    ##- normal sem brilho
+    ##- normal suavizada
+    ##- binarizada normal
+    ##- binarizada sem brilho
+    ##- binarizada suavisada
+    ##- dilatada binarizada normal
+    ##- dilatada binarizada sem brilho
+    ##- dilatada binarizada suavisada
 
 	# Abre a imagem
 	image = openImage(sys.argv[1])
@@ -310,6 +312,3 @@ def main():
 
 if __name__ == "__main__":
 	sys.exit(main())
-
-
-	

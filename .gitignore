@@ -1,4 +1,4 @@
-images/
 jsons/authGoogleVision.json
-tempImages/
+*.jpg
+*.csv
 *.pyc
