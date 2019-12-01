@@ -61,7 +61,6 @@ with open('jsons/lines.json') as linesFile:
 
 # Work with text
 def searchLine (lineNumber, attemptName, localOrGlobal):
-    print attemptName
     try:
         lineName = lines[str(lineNumber)]
         if not checkLineAlredyFound():
@@ -118,11 +117,17 @@ def getTextsDescriptions (texts):
 # Working with image
 def openImage (path):
     image = cv2.imread('images/'+path);
-    image = cv2.resize(image, (912, 513))
+    # Cut
     height, width, channels = image.shape
     croppedImage = image[0:height/2, 0:width]
 
-    return croppedImage
+    # Resize
+    scalePercent = 40
+    x = int(croppedImage.shape[1] * scalePercent / 100)
+    y = int(croppedImage.shape[0] * scalePercent / 100)
+    resizedImage = cv2.resize(croppedImage, (x, y))
+
+    return resizedImage
 
 def smoothingImage (image):
 	kernel = numpy.ones((5,5),numpy.float32)/25

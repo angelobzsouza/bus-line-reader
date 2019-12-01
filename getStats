@@ -6,4 +6,5 @@ do
   lineNumber=$(echo $(basename $file) | cut -d- -f1)
   lineNumber="${lineNumber/'_'/'/'}" 
   python busLineReaderStat.py $(basename $file) $lineNumber
+  echo $(basename $file)
 done
