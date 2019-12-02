@@ -12,7 +12,7 @@ import pytesseract as pythonOcr
 from google.cloud import vision
 from google.cloud.vision import types
 
-enableCloud = False
+enableCloud = True
 
 attemptsFail = 0
 listnerLineFound = False
@@ -126,11 +126,7 @@ def openImage (path):
 
 def smoothingImage (image):
 	kernel = numpy.ones((5,5),numpy.float32)/25
-	# funcoes para suavização, usar 1 por vez
 	image = cv2.filter2D(image,-1,kernel)
-	#image = cv2.GaussianBlur(image,(5,5),0)
-	#image = cv2.medianBlur(image,5)
-	#image = cv2.bilateralFilter(image,9,75,75)
 	return image
 
 def unshiningImage (image):
