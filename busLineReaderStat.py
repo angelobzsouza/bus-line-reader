@@ -12,10 +12,10 @@ import pytesseract as pythonOcr
 from google.cloud import vision
 from google.cloud.vision import types
 
-enableCloud = False
+enableCloud = True
 
 attemptsFail = 0
-attemptsNumber = 16 #16 in local - 17 in cloud - 33 total
+attemptsNumber = 1 #16 in local - 17 in cloud - 33 total
 listnerLineFound = False
 listnerLineWarned = False
 running = True
@@ -232,6 +232,7 @@ def main():
 
     # Abre a imagem
     image = openImage(sys.argv[1])
+    '''
     # normal suavizada
     smoothedImage = smoothingImage(image)	
     # normal sem brilho
@@ -276,8 +277,10 @@ def main():
     unshinedBinaryWhiteDilated = dilateBinary(unshinedBinaryWhite, 5)
     # binarizada sem brilho suavisada dilatada
     unshinedBinaryWhiteSmoothedDilated = dilateBinary(unshinedBinaryWhiteSmoothed, 5)
-
+    '''
+    
     ## LOCAL ATTEMPTS ##
+    '''
     thread.start_new_thread(localAttempt,(binaryOrange, 'binarizada normal laranja'))
     thread.start_new_thread(localAttempt,(binaryOrangeSmoothed, 'binarizada normal suavisada laranja'))
     thread.start_new_thread(localAttempt,(binaryOrangeDilated, 'binarizada normal dilatada laranja'))
@@ -294,9 +297,11 @@ def main():
     thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothed, 'binarizada sem brilho suavisada branca'))
     thread.start_new_thread(localAttempt,(unshinedBinaryWhiteDilated, 'binarizada sem brilho dilatada branca'))
     thread.start_new_thread(localAttempt,(unshinedBinaryWhiteSmoothedDilated, 'binarizada sem brilho suavisada dilatada branca'))
+    '''
 
     ## CLOUD ATTEMPTS ##
     if (enableCloud):
+        '''
         thread.start_new_thread(cloudAttempt,(binaryOrange,'binaryOrange', 'binarizada normal laranja'))
         thread.start_new_thread(cloudAttempt,(binaryOrangeSmoothed,'binaryOrangeSmoothed', 'binarizada normal suavisada laranja'))
         thread.start_new_thread(cloudAttempt,(binaryOrangeDilated,'binaryOrangeDilated', 'binarizada normal dilatada laranja'))
@@ -313,6 +318,7 @@ def main():
         thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothed,'unshinedBinaryWhiteSmoothed', 'binarizada sem brilho suavisada branca'))
         thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteDilated,'unshinedBinaryWhiteDilated', 'binarizada sem brilho dilatada branca'))
         thread.start_new_thread(cloudAttempt,(unshinedBinaryWhiteSmoothedDilated,'unshinedBinaryWhiteSmoothedDilated', 'binarizada sem brilho suavisada dilatada branca'))
+        '''
         thread.start_new_thread(cloudAttempt,(image, 'NormalImage', 'Imagem normal na cloud'))
 
     while running:
